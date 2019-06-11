@@ -21,12 +21,13 @@ class OutdoorSent:
 
 	def __init__(this, model='inception_T_1.h5', use_attributes=True):
 		if '.h5' in model:
-			m = model.split('_')
+			m = model.split('/')[-1].split('_')
 			assert(m[0] in ['inception', 'resnet', 'vgg', 'robust'])
 			this.model_name = m[0]
 			this.use_attributes = True if m[1] == 'T' else False
-			this.model = load_model(model)
 			this.setSize()
+			this.model = this.loadModel()
+			this.model.load_weights(model)
 		else:
 			assert(model in ['inception', 'resnet', 'vgg', 'robust'])
 			this.model_name = model
@@ -60,7 +61,7 @@ class OutdoorSent:
 			base_model = ResNet50(weights='imagenet',
 								  include_top=False,
 								  input_tensor=input_tensor)
-			x = L.Flatten()(base_model.output)
+			x = L.GlobalAveragePooling2D()(base_model.output)
 		elif this.model_name == 'inception':
 			base_model = InceptionV3(weights='imagenet',
 								include_top=False,
@@ -109,7 +110,7 @@ class OutdoorSent:
 			model = L.Concatenate()([model, att_tensor])
 
 		model = L.Dense(units=1024, activation='relu')(model)
-		model = L.Dense(units=1024, activation='relu')(model)
+		model = L.Dense(units=512, activation='relu')(model)
 		model = L.Dense(units=24, activation='relu')(model)
 
 		predictions = L.Dense(units=3, activation='softmax')(model)
@@ -199,13 +200,14 @@ class OutdoorSent:
 				return 1e-4
 		lr_decay = LearningRateScheduler(lr_scheduler)
 
-		name = 'models/'+this.model_name
+		name = 'Weights/'+this.model_name
 		name += '_'+('T' if this.use_attributes else 'F')
 		name += '_'+str(k)+'.h5'
 		checkpoint = ModelCheckpoint(name,
 									 monitor='val_acc',
 									 verbose=1,
 									 save_best_only=True,
+									 save_weights_only=True,
 									 mode='max')
 		print('Training Model')
 		this.model.fit(x=this.X_train,
