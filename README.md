@@ -2,7 +2,7 @@
 
 
 ## Installation
-```bash
+```
 git clone https://github.com/Wyverson/OutdoorSent
 pip3 install -r requirements.txt
 ```
@@ -11,13 +11,13 @@ pip3 install -r requirements.txt
 
 ## How to Use
 
-```bash
+```
 Usage: python3 OutdoorSent -m model_name [-a attribute_dir [-n att_dim]] [-t images [-k k] | -e images | -c images]
 ```
 
 **Parameters:**
 
-**-m**: Name of model to train (case sensitive), or trained model. Currently the following names are supported:
+**-m**: Name of model to train (case sensitive), or trained model. Currently the following models are supported:
 - 'robust' - Implementation of CNN described by You _et al._ [[1]](https://arxiv.org/abs/1509.06041).
 - 'vgg' - VGG16 [[2]](https://arxiv.org/abs/1409.1556).
 - 'inception' - InceptionV3 [[3]](https://arxiv.org/abs/1512.00567).
@@ -25,7 +25,7 @@ Usage: python3 OutdoorSent -m model_name [-a attribute_dir [-n att_dim]] [-t ima
 - 'densenet' - DenseNet169 [[5]](https://arxiv.org/abs/1608.06993).
 - 'xception' - Xception [[6]](https://arxiv.org/abs/1610.02357).
 
-**-a**: Directory containing attributes files in txt. Must be defined when loading a model trained with attributes. If omitted when training a model, attributes will not be used.
+**-a**: Directory containing attributes files in txt format. Must be defined when loading a model trained with attributes. If omitted when training a model, attributes will not be used.
 
 **-n**: If using attributes this must be set to attributes length. Default value is 102, length of SUN attributes.
 
@@ -40,7 +40,7 @@ Usage: python3 OutdoorSent -m model_name [-a attribute_dir [-n att_dim]] [-t ima
 
 The image list passed to '-t', '-e' and '-c' arguments is a text file where each line has the path to an image and correspondent label, for classification labels are optional.
 Example of image list:
-```bash
+```
 Images/1495676.jpg 1
 Images/36282362.jpg 2
 Images/994471.jpg 0
@@ -51,20 +51,36 @@ Labels are:
 - 1 for Neutral
 - 2 for Positive
 
+### Extract SUN Attributes
+
+```
+python3 places365.py Images
+```
+
+*Images* can be a file that list the images from where the attributes will be extracted, or a directory containing the images. This requires python version 3.6.x.
+
 ### Examples
 
 #### Train Model
-```bash
-python3 OutdoorSent.py -m robust -a Attributes -t labels.txt -k 1
+Train *robust* model using *SUN* attributes using all images in *labels.txt*:
+```
+python3 OutdoorSent.py -m robust -a SUN -t labels.txt -k 1
+```
+
+Train *VGG* model without attributes using 5-fold cross-validation, note that *-k 5* argument is optional.
+```
+python3 OutdoorSent.py -m vgg -t labels.txt -k 5
 ```
 
 #### Evaluate Images
-```bash
-python3 OutdoorSent.py -m Weights/inception_T_0.h5 -a Yolo9k -e labels.txt -n 9418
+Evaluate classification of *inception* model using *YOLO* attributes.
+```
+python3 OutdoorSent.py -m Weights/inception_T_0.h5 -a YOLO -e labels.txt -n 9418
 ```
 
 #### Classify Images
-```bash
+Classify files in '*Images*' directory using *resnet* model without attributes.
+```
 python3 OutdoorSent.py -m Weights/resnet_F_.h5 -c Images
 ```
 
