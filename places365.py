@@ -139,21 +139,21 @@ def classify(image, out):
 
 
 if len(sys.argv) < 2:
-	print("Usage: python3 run_placesCNN.py Images")
+	print("Usage: python3 places365.py Images")
 	sys.exit(0)
 
 IN = sys.argv[1]
-if not os.path.isdir('Attributes'):
-	os.mkdir('Attributes')
+if not os.path.isdir('SUN'):
+	os.mkdir('SUN')
 
 
 if os.path.isdir(IN):
 	for img in glob.glob(IN+'/*.jpg'):
-		io_img = classify(img, "Attributes/"+img.split('/')[-1].replace('.jpg', '.txt'))
+		io_img = classify(img, "SUN/"+img.split('/')[-1].replace('.jpg', '.txt'))
 		print(img, io_img)
 else:
 	with open(IN) as f:
 		for line in f:
 			img = line.split()[0]
-			classify(img, "Attributes/"+img.split('/')[-1].replace('.jpg', '.txt'))
+			classify(img, "SUN/"+img.split('/')[-1].replace('.jpg', '.txt'))
 			print(img, io_img)
